@@ -1,0 +1,102 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@600,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.jsx";
+@source "../**/*.tsx";
+
+/* Custom Theme */
+@theme {
+    /* Font Families */
+    --font-display: 'Clash Display', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+
+    /* Core Colors */
+    --color-void-black: #000000;
+    --color-surface-dark: #161616;
+    --color-surface-border: #ffffff;
+
+    /* Neon Accents */
+    --color-lime-electric: #D7FF28;
+    --color-cyan-neon: #00F0FF;
+
+    /* Custom Hard Shadows (Neo-Brutalism) */
+    --shadow-brutal-white: 4px 4px 0px 0px #ffffff;
+    --shadow-brutal-lime: 4px 4px 0px 0px #D7FF28;
+    --shadow-brutal-cyan: 4px 4px 0px 0px #00F0FF;
+}
+
+/* Global Styles */
+body {
+    background-color: var(--color-void-black);
+    color: #ffffff;
+    font-family: var(--font-mono);
+    min-width: 320px;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+::selection {
+    background: var(--color-lime-electric);
+    color: #000000;
+}
+
+.brutal-input {
+    background: #000000;
+    border: 3px solid #ffffff;
+    color: #ffffff;
+    outline: none;
+}
+
+.brutal-input:focus {
+    box-shadow: 4px 4px 0 #D7FF28;
+}
+
+.brutal-link {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-heading {
+    font-family: var(--font-display);
+}
+
+/* Utility Classes */
+.brutal-btn-lime {
+    background-color: #D7FF28;
+    color: #000000;
+    border: 3px solid #ffffff;
+    box-shadow: 4px 4px 0px 0px #ffffff;
+    font-weight: 900;
+    transition: all 0.1s ease;
+}
+
+.brutal-btn-lime:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px #ffffff;
+}
+
+.brutal-btn-lime:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px #ffffff;
+}
+
+.brutal-card {
+    background-color: #161616;
+    border: 3px solid #ffffff;
+    box-shadow: 5px 5px 0px 0px #ffffff;
+}
