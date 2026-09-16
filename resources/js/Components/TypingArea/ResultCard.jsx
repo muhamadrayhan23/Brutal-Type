@@ -9,7 +9,7 @@ export default function ResultCard({
     onGuestAction,
 }) {
     return (
-        <section className="border-4 border-white bg-surface-dark p-5 shadow-brutal-lime md:p-8">
+        <section className="border-4 border-white bg-surface-dark p-5 shadow-brutal-white md:p-8">
             <div className="mb-8 flex flex-col justify-between gap-4 border-b-2 border-white/30 pb-5 md:flex-row md:items-center">
                 <div>
                     <p className="font-mono text-xs uppercase tracking-[0.2em] text-lime-electric">
