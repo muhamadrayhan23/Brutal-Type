@@ -20,13 +20,12 @@ class ProfileController extends Controller
             ->latest('created_at')
             ->paginate(10)
             ->withQueryString();
-        $testItems = $tests->getCollection();
         $allTests = $user->testResults();
         $totalTests = $allTests->count();
         return Inertia::render('Profile/Show', [
             'user' => $user->only(['id', 'name', 'email', 'pb_wpm', 'created_at']) + ['avatar_url' => $user->avatar_url],
             'recentTests' => $tests,
-            'history' => $testItems->reverse()->values()->map(fn(TestResult $test): array => [
+            'history' => $allTests->get()->map(fn(TestResult $test): array => [
                 'wpm' => (float) $test->wpm,
                 'rawWpm' => (float) $test->raw_wpm,
                 'accuracy' => (float) $test->accuracy,

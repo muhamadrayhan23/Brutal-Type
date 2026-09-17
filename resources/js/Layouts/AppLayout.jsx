@@ -1,6 +1,8 @@
 import Navbar from "../Components/Common/Navbar";
 
 export default function AppLayout({ children, title = "Type without mercy." }) {
+    const currentYear = new Date().getFullYear();
+
     return (
         <div className="min-h-screen bg-void-black text-white">
             <Navbar />
@@ -22,8 +24,8 @@ export default function AppLayout({ children, title = "Type without mercy." }) {
                 </div>
                 {children}
             </main>
-            <footer className="items-center justify-center border-t-4 border-white px-5 py-5 font-mono text-[10px] uppercase tracking-[0.2em] text-white/45 lg:px-8">
-                BRUTALTYPE // BUILD YOUR MUSCLE MEMORY
+            <footer className="flex items-center justify-center border-t-4 border-white px-5 py-5 font-mono text-[10px] uppercase tracking-[0.2em] text-white/45 lg:px-8">
+                &copy; {currentYear} BrutalType. All rights reserved.
             </footer>
         </div>
     );

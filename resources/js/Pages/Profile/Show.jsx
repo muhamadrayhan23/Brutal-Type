@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import AppLayout from "../../Layouts/AppLayout";
 import WpmChart from "../../Components/Charts/WpmChart";
+import UserStatsChart from "../../Components/Charts/UserStatsChart";
 
 export default function ProfileShow({
     stats = {},
@@ -86,10 +87,10 @@ export default function ProfileShow({
                     <div className="mb-5 flex items-end justify-between">
                         <div>
                             <p className="font-mono text-xs uppercase text-cyan-neon">
-                                PERFORMANCE LOG
+                                PERFORMANCE STATISTICS
                             </p>
                             <h3 className="font-display text-3xl font-black uppercase">
-                                Accuracy over tests
+                                WPM distribution
                             </h3>
                         </div>
                         <span className="font-mono text-[10px] text-white/45">
@@ -97,7 +98,7 @@ export default function ProfileShow({
                         </span>
                     </div>
                     {values.length ? (
-                        <WpmChart points={values} variant="profile" />
+                        <UserStatsChart points={values} />
                     ) : (
                         <p className="border-2 border-white/20 p-6 text-center font-mono text-xs uppercase text-white/50">
                             No performance data available yet.

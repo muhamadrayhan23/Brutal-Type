@@ -29,7 +29,7 @@ export default function WpmChart({
     const chartPoints = points.length ? points : [];
     const labels = isProfile
         ? chartPoints.map((_, index) => `Test ${index + 1}`)
-        : chartPoints.map((point) => `Word ${point.word}`);
+        : chartPoints.map((point) => `${point.word}`);
     const values = chartPoints.map((point) =>
         isProfile ? Number(point.accuracy ?? 0) : Number(point.wpm ?? 0),
     );
@@ -43,10 +43,10 @@ export default function WpmChart({
                         {
                             label: isProfile ? "Accuracy" : "WPM",
                             data: values,
-                            borderColor: isProfile ? "#00F0FF" : "#D7FF28",
+                            borderColor: isProfile ? "#00F0FF" : "#00F0FF",
                             backgroundColor: isProfile
                                 ? "rgba(0,240,255,0.08)"
-                                : "rgba(215,255,40,0.08)",
+                                : "rgba(0,240,255,0.08)",
                             borderWidth: 3,
                             pointRadius: 3,
                             pointBackgroundColor: "#00F0FF",
