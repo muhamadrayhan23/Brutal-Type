@@ -8,17 +8,71 @@ import LiveStats from "../Components/TypingArea/LiveStats";
 import ResultCard from "../Components/TypingArea/ResultCard";
 import WordDisplay from "../Components/TypingArea/WordDisplay";
 import useEngine from "../Hooks/useEngine";
+
 const wordCounts = [10, 15, 20, 25, 30];
 const modes = ["English", "Indonesian", "Code"];
+const pendingGuestResultKey = "brutaltype-pending-result";
 
 export default function Home() {
     const { auth } = usePage().props;
     const [wordCount, setWordCount] = useState(30);
     const [mode, setMode] = useState("English");
     const [guestModalOpen, setGuestModalOpen] = useState(false);
+    const [saveResultModalOpen, setSaveResultModalOpen] = useState(false);
+    const [pendingGuestResult, setPendingGuestResult] = useState(null);
     const [pbModalOpen, setPbModalOpen] = useState(false);
     const engine = useEngine({ mode, wordCount });
     const savedResultRef = useRef(null);
+
+    useEffect(() => {
+        if (!auth?.user) return;
+
+        const pendingResult = sessionStorage.getItem(pendingGuestResultKey);
+        if (!pendingResult) return;
+
+        try {
+            setPendingGuestResult(JSON.parse(pendingResult));
+            setSaveResultModalOpen(true);
+        } catch {
+            sessionStorage.removeItem(pendingGuestResultKey);
+        }
+    }, [auth?.user]);
+
+    const continueToAuth = (path) => {
+        if (!engine.result) return;
+
+        sessionStorage.setItem(
+            pendingGuestResultKey,
+            JSON.stringify({
+                wpm: engine.result.wpm,
+                raw_wpm: engine.result.rawWpm,
+                accuracy: engine.result.accuracy,
+                consistency: engine.result.consistency,
+                time_elapsed: Math.max(1, engine.elapsedSeconds),
+                word_count: wordCount,
+                language: mode.toLowerCase(),
+                key_stats: { points: engine.result.points ?? [] },
+            }),
+        );
+        window.location.href = path;
+    };
+
+    const savePendingGuestResult = () => {
+        if (!pendingGuestResult) return;
+
+        router.post("/typing-test/results", pendingGuestResult, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: (page) => {
+                sessionStorage.removeItem(pendingGuestResultKey);
+                setPendingGuestResult(null);
+                setSaveResultModalOpen(false);
+                if (page.props.flash?.typing_result?.is_pb) {
+                    setPbModalOpen(true);
+                }
+            },
+        });
+    };
 
     useEffect(() => {
         if (!engine.result || savedResultRef.current === engine.result) {
@@ -167,15 +221,50 @@ export default function Home() {
                             Later
                         </Button>
                         <Button
-                            onClick={() => (window.location.href = "/register")}
+                            variant="dark"
+                            onClick={() => continueToAuth("/login")}
                         >
+                            Login
+                        </Button>
+                        <Button onClick={() => continueToAuth("/register")}>
                             Create account
                         </Button>
                     </>
                 }
             >
-                Your test result stays on screen. Create an account to save your
-                score to your profile and reach the leaderboard.
+                Your test result is ready to save. Log in or create an account
+                to keep it on your profile.
+            </Modal>
+            <Modal
+                open={saveResultModalOpen}
+                onClose={() => {
+                    sessionStorage.removeItem(pendingGuestResultKey);
+                    setPendingGuestResult(null);
+                    setSaveResultModalOpen(false);
+                }}
+                title="Save this result?"
+                actions={
+                    <>
+                        <Button
+                            variant="dark"
+                            onClick={() => {
+                                sessionStorage.removeItem(
+                                    pendingGuestResultKey,
+                                );
+                                setPendingGuestResult(null);
+                                setSaveResultModalOpen(false);
+                            }}
+                        >
+                            Later
+                        </Button>
+                        <Button onClick={savePendingGuestResult}>
+                            Save result
+                        </Button>
+                    </>
+                }
+            >
+                You are signed in. Would you like to save your guest test result
+                to your account?
             </Modal>
             <Modal
                 open={pbModalOpen}

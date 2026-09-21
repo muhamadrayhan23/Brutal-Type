@@ -6,7 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Models\TestResult;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -22,6 +22,7 @@ class ProfileController extends Controller
             ->withQueryString();
         $allTests = $user->testResults();
         $totalTests = $allTests->count();
+
         return Inertia::render('Profile/Show', [
             'user' => $user->only(['id', 'name', 'email', 'pb_wpm', 'created_at']) + ['avatar_url' => $user->avatar_url],
             'recentTests' => $tests,
@@ -56,9 +57,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update profil & ganti/timpa avatar lama
-     */
+    // Update Profile
     public function update(Request $request): RedirectResponse
     {
         $user = $request->user();
@@ -78,14 +77,23 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('avatar')) {
-            // HAPUS FOTO LAMA: Jika ada foto fisik di storage, hapus dulu agar tidak menumpuk
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
+            if ($user->avatar) {
+                $oldPath = public_path('profile/' . basename($user->avatar));
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
             }
 
-            // SIMPAN FOTO BARU: Simpan ke folder 'profile'
-            $path = $request->file('avatar')->store('profile', 'public');
-            $user->avatar = $path;
+            $destinationPath = public_path('profile');
+            if (!File::isDirectory($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true, true);
+            }
+
+            $file = $request->file('avatar');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($destinationPath, $filename);
+
+            $user->avatar = 'profile/' . $filename;
         }
 
         if ($user->isDirty('email')) {
@@ -99,19 +107,18 @@ class ProfileController extends Controller
         return Redirect::route('home')->with('success', 'Profile updated successfully!');
     }
 
-    /**
-     * Khusus Hapus Avatar saja (Kembali ke default)
-     */
+    // Delete Profile Photo
     public function destroyAvatar(Request $request): RedirectResponse
     {
         $user = $request->user();
 
-        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-            // Hapus file fisik di folder storage/app/public/profile
-            Storage::disk('public')->delete($user->avatar);
+        if ($user->avatar) {
+            $filePath = public_path('profile/' . basename($user->avatar));
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
         }
 
-        // Set kolom avatar di database jadi null
         $user->avatar = null;
         $user->save();
 
@@ -128,8 +135,11 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-            Storage::disk('public')->delete($user->avatar);
+        if ($user->avatar) {
+            $filePath = public_path('profile/' . basename($user->avatar));
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
         }
 
         $user->delete();

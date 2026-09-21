@@ -19,20 +19,26 @@ export default function WordDisplay({
                         className="mr-3 inline-block"
                     >
                         {word.split("").map((character, characterPosition) => {
+                            const completedWord =
+                                wordPosition < wordIndex
+                                    ? (completedWords[wordPosition] ?? "")
+                                    : "";
                             const typedCharacter =
                                 wordPosition < wordIndex
-                                    ? completedWords[wordPosition]?.[
-                                          characterPosition
-                                      ]
+                                    ? completedWord[characterPosition]
                                     : wordPosition === wordIndex
                                       ? currentWord[characterPosition]
                                       : undefined;
-                            const state =
-                                typedCharacter === undefined
-                                    ? "text-white/35"
-                                    : typedCharacter === character
-                                      ? "text-white"
-                                      : "bg-red-500 text-black";
+                            const missingCharacter =
+                                wordPosition < wordIndex &&
+                                characterPosition >= completedWord.length;
+                            const state = missingCharacter
+                                ? "text-white/35 underline decoration-red-500 decoration-2 underline-offset-4"
+                                : typedCharacter === undefined
+                                  ? "text-white/35"
+                                  : typedCharacter === character
+                                    ? "text-white"
+                                    : "bg-red-500 text-black underline decoration-red-500 decoration-2 underline-offset-4";
                             return (
                                 <span
                                     key={`${character}-${characterPosition}`}

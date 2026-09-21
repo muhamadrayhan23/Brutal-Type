@@ -16,17 +16,13 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Menampilkan halaman registrasi.
-     */
+    // Show Registration Page
     public function create(): Response
     {
         return Inertia::render('Auth/Register');
     }
 
-    /**
-     * Memproses pendaftaran user baru + sinkronisasi skor guest.
-     */
+    //  Memproses pendaftaran user baru + sinkronisasi skor guest.
     public function store(Request $request): RedirectResponse
     {
         $request->validate([

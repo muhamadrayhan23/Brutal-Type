@@ -10,9 +10,7 @@ use Illuminate\Validation\Rules\Password;
 
 class PasswordController extends Controller
 {
-    /**
-     * Memperbarui password pengguna.
-     */
+    // Update Password
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([

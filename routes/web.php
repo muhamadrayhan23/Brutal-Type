@@ -8,11 +8,12 @@ use App\Http\Controllers\TypingTestController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
-// Halaman utama (welcome blade) — akan diganti route Inertia 'home' nantinya
+// Main Page
 Route::get('/', fn() => Inertia::render('Home'))->name('home');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 Route::post('/typing-test/results', [TypingTestController::class, 'store'])->name('typing.results.store');
 
+// Authenticated Routes
 Route::middleware('auth')->group(function () {
     Route::get('/stats', [ProfileController::class, 'show'])->name('stats');
     Route::get('/profile', fn() => redirect()->route('profile.option'))->name('profile');
@@ -23,18 +24,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
 });
 
-// ===== Auth (Guest) =====
+// Auth (Guest)
 Route::middleware('guest')->group(function () {
-    // Halaman
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 
-    // Aksi
     Route::post('/register', [RegisteredUserController::class, 'store']);
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 });
 
-// ===== Logout (wajib login) =====
+// Logout
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');

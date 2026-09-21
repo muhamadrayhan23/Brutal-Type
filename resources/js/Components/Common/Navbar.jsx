@@ -29,7 +29,11 @@ export default function Navbar() {
 
     const avatarUrl =
         user?.avatar_url ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=000&color=fff`;
+        (user?.avatar
+            ? `/profile/${user.avatar.split("/").pop()}`
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  user?.name || "User",
+              )}&background=000&color=fff`);
 
     return (
         <>
@@ -92,7 +96,7 @@ export default function Navbar() {
                                 >
                                     <img
                                         src={avatarUrl}
-                                        alt={user.name}
+                                        alt={user?.name || "User Avatar"}
                                         className="h-8 w-8 border-2 border-white object-cover"
                                     />
                                     <span className="hidden sm:inline">

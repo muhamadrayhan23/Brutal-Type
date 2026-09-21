@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -56,7 +55,7 @@ class User extends Authenticatable
     {
         return Attribute::make(
             get: fn() => $this->avatar
-                ? Storage::url($this->avatar)
+                ? asset('profile/' . basename($this->avatar))
                 : "https://ui-avatars.com/api/?name=" . urlencode($this->name) . "&background=000&color=fff"
         );
     }
