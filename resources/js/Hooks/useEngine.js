@@ -16,6 +16,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
     const [result, setResult] = useState(null);
     const [points, setPoints] = useState([]);
     const [restartVersion, setRestartVersion] = useState(0);
+    const inputRef = useRef(null);
     const tabPressed = useRef(false);
     const typedRef = useRef("");
     const currentWordRef = useRef("");
@@ -87,6 +88,85 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
     );
 
     finishRef.current = finish;
+
+    const handleInput = useCallback(
+        (event) => {
+            const nextValue = event.target.value;
+            const previousValue = typedRef.current;
+
+            if (nextValue.length < previousValue.length) {
+                const deletedCount = previousValue.length - nextValue.length;
+                for (let index = 0; index < deletedCount; index += 1) {
+                    if (currentWordRef.current) {
+                        currentWordRef.current = currentWordRef.current.slice(
+                            0,
+                            -1,
+                        );
+                        typedRef.current = typedRef.current.slice(0, -1);
+                        setCurrentWord(currentWordRef.current);
+                    } else if (completedWordsRef.current.length) {
+                        const previousWord = completedWordsRef.current.at(-1);
+                        completedWordsRef.current =
+                            completedWordsRef.current.slice(0, -1);
+                        wordIndexRef.current -= 1;
+                        currentWordRef.current = previousWord;
+                        typedRef.current = typedRef.current.slice(
+                            0,
+                            -(previousWord.length + 1),
+                        );
+                        setCompletedWords(completedWordsRef.current);
+                        setCurrentWord(previousWord);
+                        setWordIndex(wordIndexRef.current);
+                    }
+                }
+                setTyped(typedRef.current);
+            }
+
+            const addedValue = nextValue.slice(typedRef.current.length);
+            for (const character of addedValue) {
+                if (character === " ") {
+                    if (
+                        !currentWordRef.current ||
+                        wordIndexRef.current >= words.length - 1
+                    )
+                        continue;
+                    completedWordsRef.current = [
+                        ...completedWordsRef.current,
+                        currentWordRef.current,
+                    ];
+                    currentWordRef.current = "";
+                    wordIndexRef.current += 1;
+                    typedRef.current += " ";
+                    setCompletedWords(completedWordsRef.current);
+                    setCurrentWord("");
+                    setWordIndex(wordIndexRef.current);
+                    setTyped(typedRef.current);
+                    continue;
+                }
+
+                if (character.length !== 1) continue;
+                if (!startedAtRef.current) {
+                    const now = Date.now();
+                    startedAtRef.current = now;
+                    setStartedAt(now);
+                }
+                currentWordRef.current += character;
+                typedRef.current += character;
+                setCurrentWord(currentWordRef.current);
+                setTyped(typedRef.current);
+                if (
+                    wordIndexRef.current === words.length - 1 &&
+                    currentWordRef.current.length >=
+                        words[wordIndexRef.current].length
+                ) {
+                    finishRef.current?.(typedRef.current, startedAtRef.current);
+                }
+            }
+
+            event.target.value = typedRef.current;
+        },
+        [words],
+    );
 
     useEffect(() => {
         if (!startedAt || result) return undefined;
@@ -207,5 +287,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         wpm: calculateWpm(typed, Math.max(1, elapsedSeconds), target),
         accuracy: calculateAccuracy(target, typed),
         isRunning: Boolean(startedAt && !result),
+        inputRef,
+        handleInput,
     };
 }

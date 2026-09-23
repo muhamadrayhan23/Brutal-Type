@@ -1,4 +1,7 @@
 export default function WordDisplay({
+    inputRef,
+    onInput,
+    value = "",
     target,
 
     words = target.split(" "),
@@ -9,9 +12,22 @@ export default function WordDisplay({
 }) {
     return (
         <div
+            onClick={() => inputRef.current?.focus()}
             className="min-h-44 border-3 border-white bg-surface-dark p-6 shadow-brutal-white md:p-8"
             aria-label="Typing text"
         >
+            <textarea
+                ref={inputRef}
+                onInput={onInput}
+                value={value}
+                className="absolute h-px w-px opacity-0"
+                aria-label="Type the displayed text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
+                inputMode="text"
+                rows="1"
+            />
             <div className="font-mono text-xl leading-[2.2] tracking-wide md:text-2xl">
                 {words.map((word, wordPosition) => (
                     <span

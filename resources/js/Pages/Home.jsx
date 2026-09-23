@@ -167,6 +167,9 @@ export default function Home() {
                             isRunning={engine.isRunning}
                         />
                         <WordDisplay
+                            inputRef={engine.inputRef}
+                            onInput={engine.handleInput}
+                            value={engine.typed}
                             target={engine.target}
                             typed={engine.typed}
                             words={engine.words}
