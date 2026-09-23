@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\LeaderBoardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TypingTestController;
 use Inertia\Inertia;
