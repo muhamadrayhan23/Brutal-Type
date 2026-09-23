@@ -27,15 +27,16 @@ class TypingTestController extends Controller
 
         $user = $request->user();
         $isPb = DB::transaction(function () use ($user, $validated): bool {
+
             $user->newQuery()->whereKey($user->id)->lockForUpdate()->firstOrFail();
 
             $category = TestResult::query()
                 ->where('user_id', $user->id)
                 ->where('word_count', $validated['word_count'])
                 ->where('language', $validated['language']);
+            $previousBest = (clone $category)->max('wpm');
 
-            $previousBest = (clone $category)->lockForUpdate()->max('wpm');
-            $isPb = $previousBest === null || (int) $validated['wpm'] > (int) $previousBest;
+            $isPb = $previousBest === null || (float) $validated['wpm'] > (float) $previousBest;
 
             if ($isPb) {
                 (clone $category)->where('is_pb', true)->update(['is_pb' => false]);
