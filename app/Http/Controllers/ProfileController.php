@@ -6,7 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use App\Models\TestResult;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -76,24 +76,21 @@ class ProfileController extends Controller
             $user->password = $request->new_password;
         }
 
+        // Upload Avatar Baru ke Supabase Bucket 'avatars'
         if ($request->hasFile('avatar')) {
+            // Hapus avatar lama dari Supabase jika ada
             if ($user->avatar) {
-                $oldPath = public_path('profile/' . basename($user->avatar));
-                if (File::exists($oldPath)) {
-                    File::delete($oldPath);
-                }
-            }
-
-            $destinationPath = public_path('profile');
-            if (!File::isDirectory($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true, true);
+                Storage::disk('supabase')->delete($user->avatar);
             }
 
             $file = $request->file('avatar');
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move($destinationPath, $filename);
 
-            $user->avatar = 'profile/' . $filename;
+            // Simpan file ke Supabase storage
+            $path = Storage::disk('supabase')->putFileAs('', $file, $filename);
+
+            // Simpan nama/path file ke database
+            $user->avatar = $path;
         }
 
         if ($user->isDirty('email')) {
@@ -113,14 +110,10 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($user->avatar) {
-            $filePath = public_path('profile/' . basename($user->avatar));
-            if (File::exists($filePath)) {
-                File::delete($filePath);
-            }
+            Storage::disk('supabase')->delete($user->avatar);
+            $user->avatar = null;
+            $user->save();
         }
-
-        $user->avatar = null;
-        $user->save();
 
         return Redirect::route('home')->with('success', 'Profile photo deleted successfully!');
     }
@@ -136,10 +129,7 @@ class ProfileController extends Controller
         Auth::logout();
 
         if ($user->avatar) {
-            $filePath = public_path('profile/' . basename($user->avatar));
-            if (File::exists($filePath)) {
-                File::delete($filePath);
-            }
+            Storage::disk('supabase')->delete($user->avatar);
         }
 
         $user->delete();

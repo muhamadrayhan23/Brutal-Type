@@ -28,11 +28,11 @@ export default function ProfileShow({
             <div className="space-y-8">
                 <section className="flex flex-col justify-between gap-6 border-3 border-white bg-surface-dark p-6 shadow-brutal-white md:flex-row md:items-center">
                     <div className="flex items-center gap-5">
-                        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden border-3 border-white  font-display text-3xl font-black text-black">
+                        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden border-3 border-white font-display text-3xl font-black text-black">
                             {user.avatar_url ? (
                                 <img
                                     src={user.avatar_url}
-                                    alt=""
+                                    alt={`${user.name || "User"} avatar`}
                                     className="h-full w-full object-cover"
                                 />
                             ) : (

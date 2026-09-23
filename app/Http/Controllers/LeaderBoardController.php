@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class LeaderboardController extends Controller
+class LeaderBoardController extends Controller
 {
     /**
      * Menampilkan halaman Leaderboard beserta data ranking.

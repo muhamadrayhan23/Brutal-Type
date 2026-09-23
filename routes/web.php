@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 // Main Page
 Route::get('/', fn() => Inertia::render('Home'))->name('home');
-Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
+Route::get('/leaderboard', [LeaderBoardController::class, 'index'])->name('leaderboard');
 Route::post('/typing-test/results', [TypingTestController::class, 'store'])->name('typing.results.store');
 
 // Authenticated Routes

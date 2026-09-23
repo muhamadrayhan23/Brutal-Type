@@ -1,5 +1,12 @@
 import { useForm, usePage } from "@inertiajs/react";
-import { ImagePlus, LockKeyhole, Save, Trash2 } from "lucide-react";
+import {
+    Eye,
+    EyeOff,
+    ImagePlus,
+    LockKeyhole,
+    Save,
+    Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import AppLayout from "../../Layouts/AppLayout";
 import Button from "../../Components/Common/Button";
@@ -10,12 +17,13 @@ export default function Option({ user: profileUser }) {
     const user = profileUser || auth?.user || { name: "", email: "" };
     const [avatarFileName, setAvatarFileName] = useState("");
 
-    const initialAvatar =
-        user.avatar_url ||
-        (user.avatar ? `/profile/${user.avatar.split("/").pop()}` : "");
+    const initialAvatar = user.avatar_url || "";
 
     const [avatarPreview, setAvatarPreview] = useState(initialAvatar);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         name: user.name || "",
@@ -171,7 +179,8 @@ export default function Option({ user: profileUser }) {
                         <div className="space-y-4">
                             <Field
                                 label="CURRENT PASSWORD"
-                                type="password"
+                                placeholder="••••••••"
+                                type={showCurrentPassword ? "text" : "password"}
                                 value={data.current_password}
                                 onChange={(event) =>
                                     setData(
@@ -180,25 +189,93 @@ export default function Option({ user: profileUser }) {
                                     )
                                 }
                                 error={errors.current_password}
+                                endAdornment={
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowCurrentPassword(
+                                                (visible) => !visible,
+                                            )
+                                        }
+                                        className="text-white/70 transition-colors hover:text-cyan-neon focus:outline-none focus-visible:text-cyan-neon"
+                                        aria-label={
+                                            showCurrentPassword
+                                                ? "Hide current password"
+                                                : "Show current password"
+                                        }
+                                    >
+                                        {showCurrentPassword ? (
+                                            <EyeOff size={18} />
+                                        ) : (
+                                            <Eye size={18} />
+                                        )}
+                                    </button>
+                                }
                             />
                             <Field
                                 label="NEW PASSWORD"
-                                type="password"
+                                placeholder="••••••••"
+                                type={showNewPassword ? "text" : "password"}
                                 value={data.new_password}
                                 onChange={(event) =>
                                     setData("new_password", event.target.value)
                                 }
                                 error={errors.new_password}
+                                endAdornment={
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowNewPassword(
+                                                (visible) => !visible,
+                                            )
+                                        }
+                                        className="text-white/70 transition-colors hover:text-cyan-neon focus:outline-none focus-visible:text-cyan-neon"
+                                        aria-label={
+                                            showNewPassword
+                                                ? "Hide new password"
+                                                : "Show new password"
+                                        }
+                                    >
+                                        {showNewPassword ? (
+                                            <EyeOff size={18} />
+                                        ) : (
+                                            <Eye size={18} />
+                                        )}
+                                    </button>
+                                }
                             />
                             <Field
                                 label="CONFIRM NEW PASSWORD"
-                                type="password"
+                                placeholder="••••••••"
+                                type={showConfirmPassword ? "text" : "password"}
                                 value={data.new_password_confirmation}
                                 onChange={(event) =>
                                     setData(
                                         "new_password_confirmation",
                                         event.target.value,
                                     )
+                                }
+                                endAdornment={
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowConfirmPassword(
+                                                (visible) => !visible,
+                                            )
+                                        }
+                                        className="text-white/70 transition-colors hover:text-cyan-neon focus:outline-none focus-visible:text-cyan-neon"
+                                        aria-label={
+                                            showConfirmPassword
+                                                ? "Hide confirm new password"
+                                                : "Show confirm new password"
+                                        }
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff size={18} />
+                                        ) : (
+                                            <Eye size={18} />
+                                        )}
+                                    </button>
                                 }
                             />
                         </div>
@@ -246,11 +323,24 @@ export default function Option({ user: profileUser }) {
     );
 }
 
-function Field({ label, error, ...props }) {
+function Field({ label, error, type = "text", endAdornment, ...props }) {
     return (
         <label className="block font-mono text-xs font-bold">
             <span className="mb-2 block">{label}</span>
-            <input className="brutal-input w-full px-4 py-3" {...props} />
+            <div className="relative">
+                <input
+                    {...props}
+                    type={type}
+                    className="brutal-input w-full px-4 py-3 pr-12"
+                />
+                {endAdornment && (
+                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                        <div className="pointer-events-auto">
+                            {endAdornment}
+                        </div>
+                    </div>
+                )}
+            </div>
             {error && (
                 <span className="mt-2 block text-xs text-red-400">{error}</span>
             )}

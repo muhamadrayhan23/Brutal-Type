@@ -29,11 +29,9 @@ export default function Navbar() {
 
     const avatarUrl =
         user?.avatar_url ||
-        (user?.avatar
-            ? `/profile/${user.avatar.split("/").pop()}`
-            : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  user?.name || "User",
-              )}&background=000&color=fff`);
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            user?.name || "User",
+        )}&background=000&color=fff`;
 
     return (
         <>
