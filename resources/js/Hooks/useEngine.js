@@ -196,6 +196,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 restart();
                 return;
             }
+            if (event.target === inputRef.current) return;
             if (
                 resultRef.current ||
                 event.metaKey ||
