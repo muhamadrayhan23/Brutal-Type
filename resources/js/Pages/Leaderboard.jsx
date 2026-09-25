@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Crown, Medal, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import AppLayout from "../Layouts/AppLayout";
@@ -74,9 +75,15 @@ export default function Leaderboard({ leaderboards = [], filters = {} }) {
                                             </td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="grid h-9 w-9 place-items-center border-2 border-white bg-cyan-neon font-display font-black text-black">
-                                                        {row.name?.[0] ?? "A"}
-                                                    </div>
+                                                    <LeaderboardAvatar
+                                                        name={
+                                                            row.user?.name ??
+                                                            "Anonymous"
+                                                        }
+                                                        src={
+                                                            row.user?.avatar_url
+                                                        }
+                                                    />
                                                     <span className="font-mono text-sm font-bold">
                                                         {row.user?.name ??
                                                             "Anonymous"}
@@ -132,5 +139,34 @@ export default function Leaderboard({ leaderboards = [], filters = {} }) {
                 )}
             </div>
         </AppLayout>
+    );
+}
+
+function LeaderboardAvatar({ name, src }) {
+    const [imageFailed, setImageFailed] = useState(false);
+    const initials =
+        name
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => part[0])
+            .join("")
+            .toUpperCase() || "A";
+
+    if (!src || imageFailed) {
+        return (
+            <div className="grid h-9 w-9 shrink-0 place-items-center border-2 border-white bg-cyan-neon font-display text-xs font-black text-black">
+                {initials}
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={src}
+            alt={`${name} avatar`}
+            className="h-9 w-9 shrink-0 border-2 border-white object-cover"
+            onError={() => setImageFailed(true)}
+        />
     );
 }

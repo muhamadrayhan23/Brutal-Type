@@ -29,9 +29,20 @@ export function calculateRawWpm(typed = "", elapsedSeconds = 0) {
     );
 }
 
-export function calculateResult(target, typed, elapsedSeconds, points = []) {
+export function calculateResult(
+    target,
+    typed,
+    elapsedSeconds,
+    points = [],
+    wordCompletionTimes = [],
+) {
     const correct = calculateCorrectCharacters(target, typed);
-    const wordStats = calculateWordStats(target, typed, elapsedSeconds);
+    const wordStats = calculateWordStats(
+        target,
+        typed,
+        elapsedSeconds,
+        wordCompletionTimes,
+    );
     return {
         wpm: calculateWpm(typed, elapsedSeconds, target),
         rawWpm: calculateRawWpm(typed, elapsedSeconds),
@@ -57,6 +68,7 @@ export function calculateWordStats(
     target = "",
     typed = "",
     elapsedSeconds = 1,
+    wordCompletionTimes = [],
 ) {
     const targetWords = target.split(" ").filter(Boolean);
     const typedWords = typed.split(" ");
@@ -70,11 +82,14 @@ export function calculateWordStats(
             completedTarget,
             completedText,
         );
-        const progress = Math.min(
+        const estimatedProgress = Math.min(
             1,
             completedCharacters / Math.max(completedTarget.length, 1),
         );
-        const elapsedAtWord = Math.max(elapsed * progress, 1 / 60);
+        const elapsedAtWord = Math.max(
+            Number(wordCompletionTimes[index]) || elapsed * estimatedProgress,
+            1 / 60,
+        );
 
         return {
             word: index + 1,

@@ -23,6 +23,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
     const completedWordsRef = useRef([]);
     const wordIndexRef = useRef(0);
     const startedAtRef = useRef(null);
+    const wordCompletionTimesRef = useRef([]);
     const resultRef = useRef(null);
     const finishRef = useRef(null);
     const target = useMemo(
@@ -37,6 +38,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         completedWordsRef.current = [];
         wordIndexRef.current = 0;
         startedAtRef.current = null;
+        wordCompletionTimesRef.current = [];
         resultRef.current = null;
         setTyped("");
         setCompletedWords([]);
@@ -55,6 +57,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         completedWordsRef.current = [];
         wordIndexRef.current = 0;
         startedAtRef.current = null;
+        wordCompletionTimesRef.current = [];
         resultRef.current = null;
         setTyped("");
         setCompletedWords([]);
@@ -67,7 +70,11 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
     }, []);
 
     const finish = useCallback(
-        (value = typedRef.current, started = startedAtRef.current) => {
+        (
+            value = typedRef.current,
+            started = startedAtRef.current,
+            completionTimes = wordCompletionTimesRef.current,
+        ) => {
             const elapsed = Math.max(
                 1,
                 started ? Math.ceil((Date.now() - started) / 1000) : 1,
@@ -80,6 +87,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 value,
                 elapsed,
                 nextPoints,
+                completionTimes,
             );
             setResult(nextResult);
             resultRef.current = nextResult;
@@ -108,6 +116,8 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                         const previousWord = completedWordsRef.current.at(-1);
                         completedWordsRef.current =
                             completedWordsRef.current.slice(0, -1);
+                        wordCompletionTimesRef.current =
+                            wordCompletionTimesRef.current.slice(0, -1);
                         wordIndexRef.current -= 1;
                         currentWordRef.current = previousWord;
                         typedRef.current = typedRef.current.slice(
@@ -134,6 +144,15 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                         ...completedWordsRef.current,
                         currentWordRef.current,
                     ];
+                    wordCompletionTimesRef.current = [
+                        ...wordCompletionTimesRef.current,
+                        Math.max(
+                            Math.floor(
+                                (Date.now() - startedAtRef.current) / 1000,
+                            ),
+                            1,
+                        ),
+                    ];
                     currentWordRef.current = "";
                     wordIndexRef.current += 1;
                     typedRef.current += " ";
@@ -159,6 +178,17 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                     currentWordRef.current.length >=
                         words[wordIndexRef.current].length
                 ) {
+                    if (wordCompletionTimesRef.current.length < words.length) {
+                        wordCompletionTimesRef.current = [
+                            ...wordCompletionTimesRef.current,
+                            Math.max(
+                                Math.floor(
+                                    (Date.now() - startedAtRef.current) / 1000,
+                                ),
+                                1,
+                            ),
+                        ];
+                    }
                     finishRef.current?.(typedRef.current, startedAtRef.current);
                 }
             }
@@ -218,6 +248,8 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                         0,
                         -1,
                     );
+                    wordCompletionTimesRef.current =
+                        wordCompletionTimesRef.current.slice(0, -1);
                     wordIndexRef.current -= 1;
                     currentWordRef.current = previousWord;
                     typedRef.current = typedRef.current.slice(
@@ -241,6 +273,13 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 completedWordsRef.current = [
                     ...completedWordsRef.current,
                     currentWordRef.current,
+                ];
+                wordCompletionTimesRef.current = [
+                    ...wordCompletionTimesRef.current,
+                    Math.max(
+                        (Date.now() - startedAtRef.current) / 1000,
+                        1 / 60,
+                    ),
                 ];
                 currentWordRef.current = "";
                 wordIndexRef.current += 1;
@@ -266,6 +305,17 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 currentWordRef.current.length >=
                     words[wordIndexRef.current].length
             ) {
+                if (wordCompletionTimesRef.current.length < words.length) {
+                    wordCompletionTimesRef.current = [
+                        ...wordCompletionTimesRef.current,
+                        Math.max(
+                            Math.floor(
+                                (Date.now() - startedAtRef.current) / 1000,
+                            ),
+                            1,
+                        ),
+                    ];
+                }
                 finishRef.current?.(typedRef.current, startedAtRef.current);
             }
         };

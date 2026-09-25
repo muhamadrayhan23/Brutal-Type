@@ -39,7 +39,9 @@ class LeaderBoardController extends Controller
                     'user' => [
                         'id' => $result->user?->id,
                         'name' => $result->user?->name ?? 'Anonymous',
-                        'avatar_url' => $result->user?->avatar_url,
+                        'avatar_url' => $result->user?->avatar
+                            ? $result->user->avatar_url
+                            : null,
                     ],
                     'wpm' => (float) $result->wpm,
                     'accuracy' => (float) $result->accuracy,
