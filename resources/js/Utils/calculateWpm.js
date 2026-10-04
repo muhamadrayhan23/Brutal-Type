@@ -8,11 +8,14 @@ export function calculateCorrectCharacters(target = "", typed = "") {
         );
 }
 
-export function calculateAccuracy(target = "", typed = "") {
-    if (!typed.length) return 100;
-    return Math.round(
-        (calculateCorrectCharacters(target, typed) / typed.length) * 100,
-    );
+export function calculateAccuracy(
+    target = "",
+    typed = "",
+    totalInputs = typed.length,
+    correctInputs = calculateCorrectCharacters(target, typed),
+) {
+    if (!totalInputs) return 100;
+    return Math.round((correctInputs / totalInputs) * 100);
 }
 
 export function calculateWpm(typed = "", elapsedSeconds = 0, target = "") {
@@ -22,10 +25,13 @@ export function calculateWpm(typed = "", elapsedSeconds = 0, target = "") {
     return Math.round(correct / 5 / Math.max(elapsedSeconds / 60, 1 / 60)) || 0;
 }
 
-export function calculateRawWpm(typed = "", elapsedSeconds = 0) {
+export function calculateRawWpm(
+    typed = "",
+    elapsedSeconds = 0,
+    totalInputs = typed.length,
+) {
     return (
-        Math.round(typed.length / 5 / Math.max(elapsedSeconds / 60, 1 / 60)) ||
-        0
+        Math.round(totalInputs / 5 / Math.max(elapsedSeconds / 60, 1 / 60)) || 0
     );
 }
 
@@ -35,6 +41,8 @@ export function calculateResult(
     elapsedSeconds,
     points = [],
     wordCompletionTimes = [],
+    totalInputs = typed.length,
+    correctInputs = calculateCorrectCharacters(target, typed),
 ) {
     const correct = calculateCorrectCharacters(target, typed);
     const wordStats = calculateWordStats(
@@ -45,8 +53,8 @@ export function calculateResult(
     );
     return {
         wpm: calculateWpm(typed, elapsedSeconds, target),
-        rawWpm: calculateRawWpm(typed, elapsedSeconds),
-        accuracy: calculateAccuracy(target, typed),
+        rawWpm: calculateRawWpm(typed, elapsedSeconds, totalInputs),
+        accuracy: calculateAccuracy(target, typed, totalInputs, correctInputs),
         consistency:
             points.length > 1
                 ? Math.max(

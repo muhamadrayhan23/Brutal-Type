@@ -15,6 +15,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
     const [startedAt, setStartedAt] = useState(null);
     const [result, setResult] = useState(null);
     const [points, setPoints] = useState([]);
+    const [totalInputs, setTotalInputs] = useState(0);
     const [restartVersion, setRestartVersion] = useState(0);
     const inputRef = useRef(null);
     const tabPressed = useRef(false);
@@ -24,6 +25,8 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
     const wordIndexRef = useRef(0);
     const startedAtRef = useRef(null);
     const wordCompletionTimesRef = useRef([]);
+    const totalInputsRef = useRef(0);
+    const correctInputsRef = useRef(0);
     const resultRef = useRef(null);
     const finishRef = useRef(null);
     const target = useMemo(
@@ -39,6 +42,8 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         wordIndexRef.current = 0;
         startedAtRef.current = null;
         wordCompletionTimesRef.current = [];
+        totalInputsRef.current = 0;
+        correctInputsRef.current = 0;
         resultRef.current = null;
         setTyped("");
         setCompletedWords([]);
@@ -48,6 +53,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         setStartedAt(null);
         setResult(null);
         setPoints([]);
+        setTotalInputs(0);
     }, [mode, wordCount]);
 
     const restart = useCallback(() => {
@@ -58,6 +64,8 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         wordIndexRef.current = 0;
         startedAtRef.current = null;
         wordCompletionTimesRef.current = [];
+        totalInputsRef.current = 0;
+        correctInputsRef.current = 0;
         resultRef.current = null;
         setTyped("");
         setCompletedWords([]);
@@ -67,6 +75,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         setStartedAt(null);
         setResult(null);
         setPoints([]);
+        setTotalInputs(0);
     }, []);
 
     const finish = useCallback(
@@ -88,6 +97,8 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 elapsed,
                 nextPoints,
                 completionTimes,
+                totalInputsRef.current,
+                correctInputsRef.current,
             );
             setResult(nextResult);
             resultRef.current = nextResult;
@@ -134,6 +145,13 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
 
             const addedValue = nextValue.slice(typedRef.current.length);
             for (const character of addedValue) {
+                if (character.length !== 1) continue;
+                if (character === " " && !startedAtRef.current) continue;
+                totalInputsRef.current += 1;
+                setTotalInputs(totalInputsRef.current);
+                if (character === target[typedRef.current.length]) {
+                    correctInputsRef.current += 1;
+                }
                 if (character === " ") {
                     if (
                         !currentWordRef.current ||
@@ -163,7 +181,6 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                     continue;
                 }
 
-                if (character.length !== 1) continue;
                 if (!startedAtRef.current) {
                     const now = Date.now();
                     startedAtRef.current = now;
@@ -195,7 +212,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
 
             event.target.value = typedRef.current;
         },
-        [words],
+        [target, words],
     );
 
     useEffect(() => {
@@ -226,7 +243,17 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 restart();
                 return;
             }
-            if (event.target === inputRef.current) return;
+            if (event.target === inputRef.current) {
+                if (
+                    (event.key === "Backspace" || event.key === "Delete") &&
+                    startedAtRef.current &&
+                    !resultRef.current
+                ) {
+                    totalInputsRef.current += 1;
+                    setTotalInputs(totalInputsRef.current);
+                }
+                return;
+            }
             if (
                 resultRef.current ||
                 event.metaKey ||
@@ -235,6 +262,10 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
             )
                 return;
             if (event.key === "Backspace") {
+                if (startedAtRef.current) {
+                    totalInputsRef.current += 1;
+                    setTotalInputs(totalInputsRef.current);
+                }
                 if (currentWordRef.current) {
                     currentWordRef.current = currentWordRef.current.slice(
                         0,
@@ -263,8 +294,22 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 setTyped(typedRef.current);
                 return;
             }
+            if (event.key === "Delete") {
+                if (startedAtRef.current) {
+                    totalInputsRef.current += 1;
+                    setTotalInputs(totalInputsRef.current);
+                }
+                return;
+            }
             if (event.key === " ") {
                 event.preventDefault();
+                if (startedAtRef.current) {
+                    totalInputsRef.current += 1;
+                    setTotalInputs(totalInputsRef.current);
+                    if (target[typedRef.current.length] === " ") {
+                        correctInputsRef.current += 1;
+                    }
+                }
                 if (
                     !currentWordRef.current ||
                     wordIndexRef.current >= words.length - 1
@@ -291,6 +336,11 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
                 return;
             }
             if (event.key.length !== 1) return;
+            totalInputsRef.current += 1;
+            setTotalInputs(totalInputsRef.current);
+            if (event.key === target[typedRef.current.length]) {
+                correctInputsRef.current += 1;
+            }
             if (!startedAtRef.current) {
                 const now = Date.now();
                 startedAtRef.current = now;
@@ -321,7 +371,7 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         };
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-    }, [restart, result, startedAt]);
+    }, [restart, result, startedAt, target]);
 
     return {
         target,
@@ -336,7 +386,12 @@ export default function useEngine({ mode = "English", wordCount = 30 }) {
         result,
         restart,
         wpm: calculateWpm(typed, Math.max(1, elapsedSeconds), target),
-        accuracy: calculateAccuracy(target, typed),
+        accuracy: calculateAccuracy(
+            target,
+            typed,
+            totalInputs,
+            correctInputsRef.current,
+        ),
         isRunning: Boolean(startedAt && !result),
         inputRef,
         handleInput,

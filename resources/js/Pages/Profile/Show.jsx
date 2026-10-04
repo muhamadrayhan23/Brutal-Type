@@ -1,4 +1,3 @@
-import { Link } from "@inertiajs/react";
 import {
     CalendarDays,
     Clock3,
@@ -160,10 +159,9 @@ export default function ProfileShow({
                             </span>
                             <div className="flex flex-wrap gap-2">
                                 {pagination.links.map((link, index) => (
-                                    <Link
+                                    <a
                                         key={`${link.label}-${index}`}
                                         href={link.url || "#"}
-                                        preserveScroll
                                         className={`border-2 px-3 py-2 font-mono text-xs ${
                                             link.active
                                                 ? "border-lime-electric bg-lime-electric text-black"
@@ -171,12 +169,14 @@ export default function ProfileShow({
                                                   ? "border-white hover:border-cyan-neon"
                                                   : "cursor-not-allowed border-white/20 text-white/30"
                                         }`}
-                                        onClick={(event) => {
-                                            if (!link.url)
-                                                event.preventDefault();
-                                        }}
                                         dangerouslySetInnerHTML={{
                                             __html: link.label,
+                                        }}
+                                        aria-disabled={!link.url}
+                                        onClick={(event) => {
+                                            if (!link.url) {
+                                                event.preventDefault();
+                                            }
                                         }}
                                     />
                                 ))}

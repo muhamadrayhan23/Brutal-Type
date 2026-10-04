@@ -19,7 +19,7 @@ export default function LiveStats({
             </div>
             <div className="border-r-3 border-white p-4">
                 <p className="font-mono text-[10px] uppercase text-white/50">
-                    WPM
+                    NET WPM
                 </p>
                 <p className="font-mono text-3xl font-bold text-cyan-neon">
                     {wpm}

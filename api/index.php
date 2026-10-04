@@ -1,6 +1,5 @@
 <?php
 
-// Memastikan folder direktori sementara /tmp dibuat untuk caching Laravel di Vercel
 $storageDirs = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/data',
