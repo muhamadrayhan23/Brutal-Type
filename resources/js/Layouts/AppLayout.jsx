@@ -9,18 +9,10 @@ export default function AppLayout({ children, title = "Type without mercy." }) {
             <main className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
                 <div className="mb-10 flex flex-col justify-between gap-4 border-b-2 border-white/30 pb-8 md:flex-row md:items-end">
                     <div>
-                        <p className="mb-2 font-mono text-xs font-bold uppercase tracking-[0.24em] text-cyan-neon">
-                            BRUTALTYPE / ENGINE LIVE
-                        </p>
                         <h1 className="font-display text-5xl font-black uppercase leading-none md:text-7xl">
                             {title}
                         </h1>
                     </div>
-                    <p className="max-w-xs font-mono text-xs leading-5 text-white/55">
-                        NO AUTO-CORRECT. NO EXCUSES.
-                        <br />
-                        PURE FINGER SPEED.
-                    </p>
                 </div>
                 {children}
             </main>

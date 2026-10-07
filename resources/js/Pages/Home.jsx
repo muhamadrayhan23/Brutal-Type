@@ -207,8 +207,8 @@ export default function Home() {
                     />
                 )}
                 <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white/40">
-                    <Settings2 size={14} strokeWidth={2.5} /> Engine live /{" "}
-                    {mode} dictionary / protection active
+                    <Settings2 size={14} strokeWidth={2.5} />
+                    {mode} dictionary
                 </div>
             </div>
             <Modal
