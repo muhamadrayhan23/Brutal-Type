@@ -4,7 +4,6 @@ import { Keyboard, RefreshCcw, Settings2 } from "lucide-react";
 import AppLayout from "../Layouts/AppLayout";
 import Button from "../Components/Common/Button";
 import Modal from "../Components/Common/Modal";
-import LiveStats from "../Components/TypingArea/LiveStats";
 import ResultCard from "../Components/TypingArea/ResultCard";
 import WordDisplay from "../Components/TypingArea/WordDisplay";
 import useEngine from "../Hooks/useEngine";
@@ -160,12 +159,6 @@ export default function Home() {
                 </section>
                 {!engine.result ? (
                     <section className="space-y-5">
-                        <LiveStats
-                            elapsedSeconds={engine.elapsedSeconds}
-                            wpm={engine.wpm}
-                            accuracy={engine.accuracy}
-                            isRunning={engine.isRunning}
-                        />
                         <WordDisplay
                             inputRef={engine.inputRef}
                             onInput={engine.handleInput}
