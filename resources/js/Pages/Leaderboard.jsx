@@ -11,8 +11,11 @@ export default function Leaderboard({ leaderboards = [], filters = {} }) {
         : "NO USERS AVAILABLE";
 
     return (
-        <AppLayout title="The fastest hands.">
+        <AppLayout title="The fastest hands." balancedTopSpacing>
             <div className="space-y-6">
+                <h1 className="font-display text-4xl font-black uppercase md:text-5xl">
+                    Fastest Hand.
+                </h1>
                 <div className="flex flex-wrap gap-2">
                     {[10, 15, 20, 25, 30].map((wordCount) => (
                         <Link

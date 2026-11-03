@@ -23,8 +23,11 @@ export default function ProfileShow({
     const pagination = Array.isArray(recentTests) ? null : recentTests;
     const values = history;
     return (
-        <AppLayout title="Your stats.">
+        <AppLayout title="Your stats." balancedTopSpacing>
             <div className="space-y-8">
+                <h1 className="font-display text-4xl font-black uppercase md:text-5xl">
+                    Your Stats.
+                </h1>
                 <section className="flex flex-col justify-between gap-6 border-3 border-white bg-surface-dark p-6 shadow-brutal-white md:flex-row md:items-center">
                     <div className="flex items-center gap-5">
                         <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden border-3 border-white font-display text-3xl font-black text-black">
