@@ -119,46 +119,59 @@ export default function Home() {
     }, [auth?.user, engine.elapsedSeconds, engine.result, mode, wordCount]);
 
     return (
-        <AppLayout title="Type without mercy.">
+        <AppLayout title="Type without mercy." compactTopSpacing>
             <div className="space-y-6">
-                <section className="flex flex-col justify-between gap-5 border-3 border-white bg-surface-dark p-4 shadow-brutal-white md:flex-row md:items-center md:p-5">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="mr-2 font-mono text-[10px] font-bold uppercase text-white/50">
-                            WORD COUNT
-                        </span>
-                        {wordCounts.map((value) => (
-                            <button
-                                key={value}
-                                onClick={() => {
-                                    setWordCount(value);
-                                    engine.restart();
-                                }}
-                                className={`border-2 px-3 py-2 font-mono text-xs font-bold ${wordCount === value ? "border-lime-electric bg-lime-electric text-black" : "border-white text-white hover:border-lime-electric"}`}
-                            >
-                                {value}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="mr-2 font-mono text-[10px] font-bold uppercase text-white/50">
-                            LANGUAGE
-                        </span>
-                        {modes.map((value) => (
-                            <button
-                                key={value}
-                                onClick={() => {
-                                    setMode(value);
-                                    engine.restart();
-                                }}
-                                className={`border-2 px-3 py-2 font-mono text-xs font-bold ${mode === value ? "border-cyan-neon bg-cyan-neon text-black" : "border-white text-white hover:border-cyan-neon"}`}
-                            >
-                                {value}
-                            </button>
-                        ))}
-                    </div>
-                </section>
+                {!engine.result && (
+                    <section
+                        aria-hidden={engine.isRunning}
+                        inert={engine.isRunning}
+                        className={`${engine.isRunning ? "invisible pointer-events-none" : ""} flex flex-col justify-between gap-5 border-3 border-white bg-surface-dark p-4 shadow-brutal-white md:flex-row md:items-center md:p-5`}
+                    >
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="mr-2 font-mono text-[10px] font-bold uppercase text-white/50">
+                                WORD COUNT
+                            </span>
+                            {wordCounts.map((value) => (
+                                <button
+                                    key={value}
+                                    onClick={() => {
+                                        setWordCount(value);
+                                        engine.restart();
+                                    }}
+                                    className={`border-2 px-3 py-2 font-mono text-xs font-bold ${wordCount === value ? "border-lime-electric bg-lime-electric text-black" : "border-white text-white hover:border-lime-electric"}`}
+                                >
+                                    {value}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="mr-2 font-mono text-[10px] font-bold uppercase text-white/50">
+                                LANGUAGE
+                            </span>
+                            {modes.map((value) => (
+                                <button
+                                    key={value}
+                                    onClick={() => {
+                                        setMode(value);
+                                        engine.restart();
+                                    }}
+                                    className={`border-2 px-3 py-2 font-mono text-xs font-bold ${mode === value ? "border-cyan-neon bg-cyan-neon text-black" : "border-white text-white hover:border-cyan-neon"}`}
+                                >
+                                    {value}
+                                </button>
+                            ))}
+                        </div>
+                    </section>
+                )}
                 {!engine.result ? (
                     <section className="space-y-5">
+                        <div className="flex h-8 items-center pl-6 font-mono text-xl font-bold tracking-wide text-lime-electric md:pl-8 md:text-2xl">
+                            {engine.isRunning && (
+                                <span aria-live="polite">
+                                    {engine.completedWords.length}/{wordCount}
+                                </span>
+                            )}
+                        </div>
                         <WordDisplay
                             inputRef={engine.inputRef}
                             onInput={engine.handleInput}
@@ -171,22 +184,22 @@ export default function Home() {
                             wordIndex={engine.wordIndex}
                             charIndex={engine.charIndex}
                         />
-                        <div className="flex flex-col justify-between gap-4 border-l-4 border-lime-electric pl-4 md:flex-row md:items-center">
-                            <p className="font-mono text-xs text-white/60">
-                                <Keyboard
-                                    size={15}
-                                    className="mr-2 inline text-lime-electric"
-                                    strokeWidth={2.5}
-                                />
-                                Click the text area and start typing.{" "}
-                                <span className="text-white">TAB + ENTER</span>{" "}
-                                to restart.
-                            </p>
-                            <Button variant="dark" onClick={engine.restart}>
-                                <RefreshCcw size={15} strokeWidth={2.5} />{" "}
-                                Restart test
-                            </Button>
-                        </div>
+                        {!engine.isRunning && (
+                            <div className="flex flex-col justify-between gap-4 border-l-4 border-lime-electric pl-4 md:flex-row md:items-center">
+                                <p className="font-mono text-xs text-white/60">
+                                    <Keyboard
+                                        size={15}
+                                        className="mr-2 inline text-lime-electric"
+                                        strokeWidth={2.5}
+                                    />
+                                    Click the text area and start typing.{" "}
+                                    <span className="text-white">
+                                        TAB + ENTER
+                                    </span>{" "}
+                                    to restart.
+                                </p>
+                            </div>
+                        )}
                     </section>
                 ) : (
                     <ResultCard
@@ -199,10 +212,12 @@ export default function Home() {
                         onGuestAction={() => setGuestModalOpen(true)}
                     />
                 )}
-                <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white/40">
-                    <Settings2 size={14} strokeWidth={2.5} />
-                    {mode} dictionary
-                </div>
+                {!engine.isRunning && (
+                    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                        <Settings2 size={14} strokeWidth={2.5} />
+                        {mode} dictionary
+                    </div>
+                )}
             </div>
             <Modal
                 open={guestModalOpen}

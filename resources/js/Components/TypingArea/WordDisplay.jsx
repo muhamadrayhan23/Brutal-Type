@@ -13,7 +13,7 @@ export default function WordDisplay({
     return (
         <div
             onClick={() => inputRef.current?.focus()}
-            className="min-h-44 border-3 border-white bg-surface-dark p-6 shadow-brutal-white md:p-8"
+            className="min-h-44 p-6 md:p-8"
             aria-label="Typing text"
         >
             <textarea
